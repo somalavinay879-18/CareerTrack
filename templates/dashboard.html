@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="fw-bold">Career Dashboard</h1>
+            <p class="text-muted">
+                Track applications, interviews, and offers in one place.
+            </p>
+        </div>
+
+        <a href="/add" class="btn btn-dark btn-lg">
+            + New Application
+        </a>
+
+    </div>
+
+    <!-- Top Stats -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-2">Applied</p>
+
+                    <h1 class="fw-bold text-primary">
+                        {{ applied }}
+                    </h1>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-2">Interviews</p>
+
+                    <h1 class="fw-bold text-warning">
+                        {{ interview }}
+                    </h1>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-2">Accepted</p>
+
+                    <h1 class="fw-bold text-success">
+                        {{ accepted }}
+                    </h1>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-2">Rejected</p>
+
+                    <h1 class="fw-bold text-danger">
+                        {{ rejected }}
+                    </h1>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Middle Section -->
+    <div class="row g-4 mb-4">
+
+        <!-- Success Rate -->
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        Success Rate
+                    </h5>
+
+                    <h1 class="fw-bold">
+                        {{ success_rate }}%
+                    </h1>
+
+                    <div class="progress mt-3" style="height:12px;">
+
+                        <div class="progress-bar bg-success" style="width: {{ success_rate }}%;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Goal Tracker -->
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        Monthly Goal
+                    </h5>
+
+                    <p class="text-muted">
+                        Goal: 50 Applications
+                    </p>
+
+                    <h2 class="fw-bold">
+                        {{ total }}/50
+                    </h2>
+
+                    <div class="progress mt-3" style="height:12px;">
+
+                        <div class="progress-bar bg-primary"
+                            style="width: {{ (total/50*100) if total < 50 else 100 }}%;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Insights -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <h5>Quick Insights</h5>
+
+                    <hr>
+
+                    <p>
+                        Total Applications:
+                        <strong>{{ total }}</strong>
+                    </p>
+
+                    <p>
+                        Interviews:
+                        <strong>{{ interview }}</strong>
+                    </p>
+
+                    <p>
+                        Offers:
+                        <strong>{{ accepted }}</strong>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <h5>Recent Activity</h5>
+
+                    <hr>
+
+                    {% if recent %}
+
+                    {% for app in recent %}
+
+                    <div class="mb-3">
+
+                        <strong>
+                            {{ app[1] }}
+                        </strong>
+
+                        <br>
+
+                        <span class="text-muted">
+                            Applied for {{ app[2] }}
+                        </span>
+
+                        <span class="badge bg-secondary float-end">
+                            {{ app[3] }}
+                        </span>
+
+                    </div>
+
+                    {% endfor %}
+
+                    {% else %}
+
+                    <p class="text-muted">
+                        No applications added yet.
+                    </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Recent Applications Table -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="mb-4">
+                Recent Applications
+            </h5>
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Company</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for app in recent %}
+
+                    <tr>
+
+                        <td>{{ app[1] }}</td>
+
+                        <td>{{ app[2] }}</td>
+
+                        <td>
+
+                            <span class="badge bg-primary">
+                                {{ app[3] }}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
