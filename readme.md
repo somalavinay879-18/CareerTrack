@@ -270,14 +270,7 @@ Through this project, the following concepts were learned and implemented:
 ![Applications](screenshots/applications.png)
 
 ### Add Application Page
-![Add Application](screenshots/add_application.png)
-
-## Author
-
-**Vinay Somala**
-
-Bachelor's Student  
-University Project – CareerTrack Job Application Management System
+![Add Application](screenshots/add_application.png)git status
 
 
 ## Declaration
