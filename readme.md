@@ -264,14 +264,13 @@ Through this project, the following concepts were learned and implemented:
 ## Screenshots
 
 ### Dashboard
-(Add screenshot here)
+![Dashboard](screenshots/dashboard.png)
 
 ### Applications Page
-(Add screenshot here)
+![Applications](screenshots/applications.png)
 
 ### Add Application Page
-(Add screenshot here)
-
+![Add Application](screenshots/add_application.png)
 
 ## Author
 
