@@ -283,4 +283,3 @@ University Project – CareerTrack Job Application Management System
 ## Declaration
 
 This project was developed for academic purposes as part of coursework requirements and demonstrates the practical implementation of web development concepts using Flask, SQLite, Bootstrap, and Docker.
-Test push
