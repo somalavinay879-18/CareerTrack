@@ -1,19 +1,8 @@
-import sqlite3
+"""Create (or migrate) the local database. The app also does this on start-up."""
+import os
 
-connection = sqlite3.connect("database.db")
+import db
 
-cursor = connection.cursor()
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS applications (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    company TEXT NOT NULL,
-    position TEXT NOT NULL,
-    status TEXT NOT NULL
-)
-""")
-
-connection.commit()
-connection.close()
-
-print("Database created!")
+path = os.environ.get("DATABASE", "database.db")
+db.init_db(path)
+print(f"Database ready: {path}")

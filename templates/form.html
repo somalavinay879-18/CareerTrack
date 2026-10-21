@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">{{ "Edit Application" if mode == "edit" else "Add Application" }}</h2>
+
+<form method="POST">
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Company</label>
+            <input type="text" name="company" class="form-control" maxlength="120"
+                value="{{ item.get('company', '') }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Position</label>
+            <input type="text" name="position" class="form-control" maxlength="120"
+                value="{{ item.get('position', '') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+                {% for s in statuses %}
+                <option {% if s == item.get('status') %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Date applied</label>
+            <input type="date" name="date_applied" class="form-control" value="{{ item.get('date_applied') or '' }}">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Source</label>
+            <input type="text" name="source" class="form-control" list="sources" maxlength="60"
+                value="{{ item.get('source') or '' }}">
+            <datalist id="sources">
+                {% for s in sources %}<option value="{{ s }}">{% endfor %}
+            </datalist>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Notes</label>
+            <textarea name="notes" class="form-control" rows="3" maxlength="1000">{{ item.get('notes') or '' }}</textarea>
+        </div>
+    </div>
+
+    <button class="btn btn-success mt-4">Save Application</button>
+    <a class="btn btn-outline-secondary mt-4" href="{{ url_for('applications') }}">Cancel</a>
+
+</form>
+
+{% endblock %}

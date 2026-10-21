@@ -11,8 +11,17 @@ database.db
 # macOS
 .DS_Store
 
+# Windows
+Thumbs.db
+Desktop.ini
+
 # VS Code
 .vscode/
 
 # Docker
 *.log
+
+# Tests and local demo data
+.pytest_cache/
+demo.db
+*.db

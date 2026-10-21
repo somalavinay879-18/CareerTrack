@@ -1,279 +1,117 @@
-# CareerTrack – Job Application Tracking System
+# CareerTrack – Job Application Tracker with Analytics
 
-## Project Overview
+A small Flask web app to track job applications and see how a job search is going: response rate, interview rate, offers, weekly activity and which sources work best.
 
-CareerTrack is a web-based job application tracking system developed using Flask and SQLite. The application helps users organize and monitor their job search process by allowing them to add, view, and manage job applications from a centralized dashboard.
+I built the first version as a Flask + SQLite + Docker project and later extended it with editing, search, CSV import/export, an analytics page, automated tests and CI.
 
-The system provides insights into application progress, interview opportunities, acceptance rates, and overall job search performance through an interactive dashboard.
-
-
-## Objectives
-
-The primary objectives of this project are:
-
-- Track job applications efficiently
-- Monitor application status throughout the recruitment process
-- Visualize application statistics through a dashboard
-- Demonstrate CRUD operations using Flask and SQLite
-- Implement a responsive and user-friendly interface
-- Containerize the application using Docker
-
+![Dashboard](screenshots/dashboard.png)
 
 ## Features
 
-### Dashboard
-- Total applications count
-- Applied applications count
-- Interview applications count
-- Accepted applications count
-- Rejected applications count
-- Success rate calculation
-- Monthly application goal tracker
-- Recent activity section
+- **Applications:** add, edit, delete, search by company or position, filter by status
+- **Fields:** company, position, status (Applied / Interview / Accepted / Rejected), date applied, source, notes
+- **Dashboard:** counts per status, response rate, interview rate, offer rate, recent applications
+- **Analytics page:** applications per week (last 12 weeks), status split, funnel (applications → interview or later → offers), applications by source
+- **CSV import / export:** back up your data or load an existing list; invalid rows are skipped and reported
+- **JSON endpoint:** `GET /api/stats` returns the summary numbers
+- **Tests and CI:** 22 pytest tests, run automatically by GitHub Actions on every push
+- **Docker:** runs with gunicorn; the database lives in a volume
 
-### Application Management
-- Add new job applications
-- View all applications
-- Delete applications
-- Track application status
+![Applications](screenshots/applications.png)
+![Analytics](screenshots/analytics.png)
 
-### Status Categories
-- Applied
-- Interview
-- Accepted
-- Rejected
+## How the metrics are defined
 
-### Technical Features
-- SQLite database integration
-- Dynamic HTML rendering with Jinja2
-- Responsive Bootstrap interface
-- Docker containerization
+| Metric | Definition |
+|---|---|
+| Response rate | (Interview + Accepted + Rejected) ÷ all applications |
+| Interview rate | (Interview + Accepted) ÷ all applications |
+| Offer rate | Accepted ÷ all applications |
 
+## Tech stack
 
+Python 3.11, Flask, SQLite, Jinja2, Bootstrap 5, Chart.js, pytest, gunicorn, Docker, GitHub Actions
 
-## Technologies Used
-
-| Technology | Purpose |
-|------------|----------|
-| Python | Backend Development |
-| Flask | Web Framework |
-| SQLite | Database Management |
-| HTML5 | Structure |
-| CSS3 | Styling |
-| Bootstrap 5 | Responsive UI |
-| Jinja2 | Template Engine |
-| Docker | Containerization |
-
-
-
-## System Architecture
-
-```text
-User
-  |
-  v
-Flask Application
-  |
-  +---- Dashboard
-  |
-  +---- Add Application
-  |
-  +---- View Applications
-  |
-  +---- Delete Application
-  |
-  v
-SQLite Database
-```
-
-
-
-## Project Structure
-
-```text
-CareerTrack/
-│
-├── app.py
-├── database.py
-├── database.db
-├── requirements.txt
-├── Dockerfile
-├── README.md
-│
-├── templates/
-│   ├── base.html
-│   ├── dashboard.html
-│   ├── applications.html
-│   └── add_application.html
-│
-└── static/
-```
-
-
-
-## Database Design
-
-### Table: applications
-
-| Field | Data Type | Description |
-|---------|----------|-------------|
-| id | INTEGER | Primary Key |
-| company | TEXT | Company Name |
-| position | TEXT | Job Position |
-| status | TEXT | Application Status |
-
----
-
-## Installation Guide
-
-### Step 1: Clone the Repository
+## Run locally
 
 ```bash
-git clone https://github.com/your-username/CareerTrack.git
+git clone https://github.com/somalavinay879-18/CareerTrack.git
 cd CareerTrack
-```
-
-### Step 2: Create Virtual Environment
-
-```bash
 python -m venv venv
-```
-
-### Activate Environment
-
-Mac/Linux:
-
-```bash
-source venv/bin/activate
-```
-
-Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-### Step 3: Install Dependencies
-
-```bash
+source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-### Step 4: Create Database
-
-```bash
-python database.py
-```
-
-### Step 5: Run Application
-
-```bash
 python app.py
 ```
 
-### Access Application
+Open http://localhost:5001. The database file `database.db` is created automatically. If you used an older version, your existing data is kept and the new columns are added automatically.
 
-```text
-http://localhost:5001
-```
-
-
-## Docker Containerization
-
-This project has been containerized using Docker.
-
-### Build Docker Image
+## Run with Docker
 
 ```bash
 docker build -t careertrack .
+docker run --rm -p 5001:5001 -v careertrack-data:/data careertrack
 ```
 
-### Run Docker Container
+Open http://localhost:5001. The volume `careertrack-data` keeps your applications between runs.
+
+## Run the tests
 
 ```bash
-docker run --rm -p 5001:5000 careertrack
+pip install -r requirements-dev.txt
+pytest -q
 ```
 
-### Access Application
+The tests cover the pages, add / edit / delete, input validation, search and filters, CSV import and export (including spreadsheet formula protection), the analytics calculations, and migration of an old database.
 
-```text
-http://localhost:5001
+## Try it with demo data
+
+```bash
+DATABASE=demo.db python seed_demo.py     # adds made-up demo rows
+DATABASE=demo.db python app.py
 ```
 
+## Project structure
 
+```
+CareerTrack/
+├── app.py              # Flask app and routes
+├── analytics.py        # metrics and chart data (pure functions, unit tested)
+├── db.py               # SQLite connection and automatic migration
+├── database.py         # creates / migrates the database from the command line
+├── seed_demo.py        # demo data generator
+├── templates/          # base, dashboard, applications, form, analytics
+├── tests/test_app.py
+├── .github/workflows/ci.yml
+├── Dockerfile
+├── requirements.txt
+└── requirements-dev.txt
+```
 
-## CRUD Operations Implemented
+## Database
 
-| Operation | Description |
-|------------|-------------|
-| Create | Add new application |
-| Read | View applications |
-| Update | Status tracking |
-| Delete | Remove application |
+Table `applications`
 
+| Field | Type | Description |
+|---|---|---|
+| id | INTEGER | Primary key |
+| company | TEXT | Company name |
+| position | TEXT | Job position |
+| status | TEXT | Applied, Interview, Accepted or Rejected |
+| date_applied | TEXT | ISO date (YYYY-MM-DD) |
+| source | TEXT | e.g. LinkedIn, StepStone, referral |
+| notes | TEXT | Free text, up to 1000 characters |
 
+## Design notes
 
-## Sample Workflow
+- All SQL uses parameters (no string-built queries). Jinja escapes all output.
+- Deleting uses POST (not a link) so a crawler or a stray click cannot delete data.
+- CSV export prefixes cells that start with `=`, `+`, `-` or `@` so Excel does not run them as formulas.
+- Uploads are limited to 1 MB and 2,000 rows.
+- Set `SECRET_KEY` as an environment variable if you deploy this publicly.
 
-1. Open CareerTrack Dashboard
-2. Add a new job application
-3. Select application status
-4. Save application
-5. View applications list
-6. Track progress through dashboard metrics
-7. Delete applications when required
+## Roadmap
 
-
-
-## Challenges Faced
-
-- Designing an intuitive dashboard interface
-- Managing SQLite database operations
-- Implementing dynamic Flask routing
-- Docker container configuration
-- Port conflict resolution during deployment
-
-
-## Future Enhancements
-
-- User Authentication and Authorization
-- Resume Upload Feature
-- Email Notifications
-- Application Editing Functionality
-- Interview Scheduling
-- Data Visualization Charts
-- Cloud Deployment (AWS, Azure, Render)
-- Multi-user Support
-
----
-
-## Learning Outcomes
-
-Through this project, the following concepts were learned and implemented:
-
-- Flask Web Development
-- Routing and Templates
-- SQLite Database Integration
-- CRUD Operations
-- Bootstrap UI Design
-- Docker Containerization
-- Project Structure and Organization
-- Full-Stack Development Fundamentals
-
-
-## Screenshots
-
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-### Applications Page
-![Applications](screenshots/applications.png)
-
-### Add Application Page
-![Add Application](screenshots/add_application.png)
-
-
-
-## Declaration
-
-This project was developed for academic purposes as part of coursework requirements and demonstrates the practical implementation of web development concepts using Flask, SQLite, Bootstrap, and Docker.
+- Time-to-response tracking (needs a response date per application)
+- Email reminders for follow-ups
+- User login for multi-user use
+- Public demo deployment (Render)

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">Analytics</h2>
+
+<div class="row g-4 mb-4">
+    {% for label, value, hint in [
+        ("Applications", stats.total, "all time"),
+        ("Response rate", stats.response_rate ~ "%", "got any answer"),
+        ("Interview rate", stats.interview_rate ~ "%", "interview or later"),
+        ("Offer rate", stats.offer_rate ~ "%", "ended in an offer")] %}
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted mb-1">{{ label }}</p>
+                <h1 class="fw-bold mb-0">{{ value }}</h1>
+                <small class="text-muted">{{ hint }}</small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <h5>Applications per week (last 12 weeks)</h5>
+            <canvas id="weekly" height="120"></canvas>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <h5>Status split</h5>
+            <canvas id="status"></canvas>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <h5>Funnel</h5>
+            <canvas id="funnel" height="140"></canvas>
+        </div></div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <h5>Applications by source</h5>
+            <canvas id="sources" height="140"></canvas>
+        </div></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    const stats = {{ stats | tojson }};
+    const opts = { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } };
+
+    new Chart(document.getElementById("weekly"), {
+        type: "bar",
+        data: { labels: {{ week_labels | tojson }}, datasets: [{ data: {{ week_values | tojson }}, backgroundColor: "#0d6efd" }] },
+        options: opts
+    });
+    new Chart(document.getElementById("status"), {
+        type: "doughnut",
+        data: {
+            labels: ["Applied", "Interview", "Accepted", "Rejected"],
+            datasets: [{ data: [stats.applied, stats.interview, stats.accepted, stats.rejected],
+                backgroundColor: ["#0d6efd", "#ffc107", "#198754", "#dc3545"] }]
+        },
+        options: { plugins: { legend: { position: "bottom" } } }
+    });
+    new Chart(document.getElementById("funnel"), {
+        type: "bar",
+        data: { labels: stats.funnel.map(f => f[0]), datasets: [{ data: stats.funnel.map(f => f[1]), backgroundColor: ["#6c757d", "#ffc107", "#198754"] }] },
+        options: { indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+    new Chart(document.getElementById("sources"), {
+        type: "bar",
+        data: { labels: {{ source_labels | tojson }}, datasets: [{ data: {{ source_values | tojson }}, backgroundColor: "#6610f2" }] },
+        options: opts
+    });
+</script>
+
+{% endblock %}
